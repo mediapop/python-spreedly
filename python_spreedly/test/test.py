@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
 import unittest
+from python_spreedly.api import Client
 
-from api import Client
-
+#TODO find a robust way of doing this without one person's tokens/names
+# hard coded
 SPREEDLY_AUTH_TOKEN = '59f064f450af88df24f54281f3d78ad8ee0eb8f0'
 SPREEDLY_SITE_NAME = 'shelfworthytest'
 
-class  TestCase(unittest.TestCase):
+class  SpreedlyTests(unittest.TestCase):
     def setUp(self):
         self.sclient = Client(SPREEDLY_AUTH_TOKEN, SPREEDLY_SITE_NAME)
 

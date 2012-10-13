@@ -1,2 +1,5 @@
 *.py?
 nbproject
+
+# vim swap files
+*.sw?
