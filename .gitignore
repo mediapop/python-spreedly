@@ -1,5 +1,6 @@
 *.py?
 nbproject
+site_conf.py
 
 # vim swap files
 *.sw?
