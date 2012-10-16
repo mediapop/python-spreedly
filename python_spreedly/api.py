@@ -237,7 +237,7 @@ class Client(object):
         :raises: HTTPError if not 200
         """
         url = 'subscribers/{id}.xml'.format(id=subscriber_id)
-        response = query(url, action='get')
+        response = self.query(url, action='get')
         if response.status_code != 200:
             raise requests.HTTPError(code=response.status_code)
 
@@ -291,21 +291,39 @@ class Client(object):
         url = 'subscribers/{id}.xml'.format(id=subscriber_id)
         self.query(data=ET.tostring(root), action='put')
 
-    def create_complimentary_subscription(self, subscriber_id, duration, duration_units, feature_level):
-        """ .. py:method:: create_complimentary_subscription(subscriber_id, duration, duration_units, feature_level)
+    def create_complimentary_subscription(self, subscriber_id,
+            duration, duration_units, feature_level,
+            start_time=None, amount=None):
+        """ .. py:method:: create_complimentary_subscription(subscriber_id, duration, duration_units, feature_level[, start_time=None, amount=None])
 
         corrisponds to adding corrisponding subscription to a subscriber
+        :param subscriber_id: Subscriber ID
+        :param duration: Duration (unitless)
+        :param duration_units: Unit for above (days, weeks, months i think)
+        :param feature_level string: what feature level this is at
+        :param start_time: If assgining a value for pro-rating purpose, you need this start datetime
+        :type start_time: datetime.datetime or None
+        :param amount: How much this comp is worth
+        :type amount: float or None
         """
+        if start_time and amount:
+            comp_value = """<start-time>{start_time}</start_time>
+            <amount>{amount}</amount>""".format(
+                    start_time=start_time.strftime('%Y-%m-%dT%H:%M:%SZ'),
+                    amount=amount)
+        else:
+            comp_value = ''
         data = """<complimentary_subscription>
             <duration_quantity>{duration}</duration_quantity>
             <duration_units>{duration_units}</duration_units>
             <feature_level>{level}</feature_level>
+            {comp_value}
             </complimentary_subscription>""".format(
                     duration=duration, duration_units=duration_units, 
-                    level=feature_level)
+                    level=feature_level,comp_value=comp_value)
 
-        self.set_url('subscribers/%s/complimentary_subscriptions.xml' % subscriber_id)
-        self.query(data)
+        url = 'subscribers/{subscriber_id}/complimentary_subscriptions.xml'.format(subscriber_id=subscriber_id)
+        self.query(url, data, action='post')
 
     def complimentary_time_extensions(self, subscriber_id, duration, duration_units):
         """ .. py:method:: complimentary_time_extension(subscriber_id, duration, duration_units)
