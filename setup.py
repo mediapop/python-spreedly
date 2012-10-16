@@ -33,7 +33,7 @@ setup(
         'Intended Audience :: System Administrators',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'License :: OSI Approved :: BSD',
+        'License :: OSI Approved :: MIT',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
 )
