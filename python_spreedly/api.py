@@ -1,4 +1,6 @@
 import httplib, urllib2, time, calendar
+from urlparse import urljoin, urlparse
+import requests
 from datetime import datetime
 from decimal import Decimal
 from xml.etree.ElementTree import fromstring
@@ -6,6 +8,7 @@ from xml.etree import ElementTree as ET
 from base64 import b64encode
 
 API_VERSION = 'v4'
+
 
 def utc_to_local(dt):
     ''' Converts utc datetime to local'''
@@ -20,21 +23,24 @@ def str_to_datetime(s):
 
 class Client:
     def __init__(self, token, site_name):
-        self.auth = b64encode('%s:x' % token)
-        self.base_host = 'spreedly.com'
-        self.base_path = '/api/%s/%s' % (API_VERSION, site_name)
-        self.base_url = 'https://%s%s' % (self.base_host, self.base_path)
+        self.auth = b64encode('{token}:x'.format(token=token))
+        self.base_host = 'https://spreedly.com'
+        self.base_path = '/api/{api_version}/{site_name}'.format(
+                api_version=API_VERSION, site_name=site_name)
+        self.base_url = urljoin(self.base_host,self.base_path)
         self.url = None
 
 
     def get_response(self):
+        #TODO get rid of this, un-pythonic and adds overhead
         return self.response
 
     def get_url(self):
+        #TODO get rid of this, un-pythonic and adds overhead
         return self.url
 
     def set_url(self, url):
-        self.url = '%s/%s' % (self.base_url, url)
+        self.url = urljoin(self.base_path, url)
 
     def query(self, data=None, put=False):
         opener = urllib2.build_opener(urllib2.HTTPHandler)

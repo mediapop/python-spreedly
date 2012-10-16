@@ -20,7 +20,7 @@ setup(
     packages=find_packages(exclude=("tests",)),
     zip_safe=False,
     install_requires=[
-        'requests==0.14.0'
+        'requests==0.14.0',
     ],
     test_requires=[
         'nose>=1.2.1',
