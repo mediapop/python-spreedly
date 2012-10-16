@@ -60,7 +60,7 @@ class Client(object):
         action = action.lower()
         if action not in ('get', 'put', 'post','delete'):
             raise NotImplementedError()
-        url = urljoin(self.base_path, url)
+        url = urljoin(self.base_url, url)
         headers = {
                 'User-Agent': 'python-spreedly 1.0',
                 }
@@ -80,7 +80,9 @@ class Client(object):
         response = self.query('subscription_plans.xml', action='get')
 
         if response.status_code != 200:
-            raise requests.HTTPError(code=response.status_code)
+            e = requests.HTTPError()
+            e.code = response.status_code
+            raise e
 
         # Parse
         result = []
@@ -239,7 +241,9 @@ class Client(object):
         url = 'subscribers/{id}.xml'.format(id=subscriber_id)
         response = self.query(url, action='get')
         if response.status_code != 200:
-            raise requests.HTTPError(code=response.status_code)
+            e = requests.HTTPError()
+            e.code = response.status_code
+            raise e
 
         # Parse
         result = []
