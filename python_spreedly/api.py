@@ -21,7 +21,15 @@ def str_to_datetime(s):
     return utc_to_local(datetime.strptime(s, '%Y-%m-%dT%H:%M:%SZ'))
 
 
-class Client:
+class Client(object):
+    """
+    .. py:class:: Client(token, site_name)
+    Create an object to manage queries for a Client.
+
+    :param token: API access token for authorization.
+    :param site_name: the site_name registered with spreedly.
+    """
+
     def __init__(self, token, site_name):
         self.auth = b64encode('{token}:x'.format(token=token))
         self.base_host = 'https://spreedly.com'
@@ -30,22 +38,16 @@ class Client:
         self.base_url = urljoin(self.base_host,self.base_path)
         self.url = None
 
-
-    def get_response(self):
-        #TODO get rid of this, un-pythonic and adds overhead
-        return self.response
-
-    def get_url(self):
-        #TODO get rid of this, un-pythonic and adds overhead
-        return self.url
-
     def set_url(self, url):
         self.url = urljoin(self.base_path, url)
 
     def query(self, data=None, put=False):
+        """
+        POST, PUT, (?GET?)
+        """
         opener = urllib2.build_opener(urllib2.HTTPHandler)
 
-        req = urllib2.Request(url=self.get_url())
+        req = urllib2.Request(url=self.url)
         req.add_header('User-agent', 'python-spreedly 1.0')
         req.add_header('Authorization', 'Basic %s' % self.auth)
 
@@ -68,7 +70,7 @@ class Client:
 
         # Parse
         result = []
-        tree = fromstring(self.get_response())
+        tree = fromstring(self.response)
         for plan in tree.getiterator('subscription-plan'):
             data = {
                 'name': plan.findtext('name'),
@@ -112,7 +114,7 @@ class Client:
 
         # Parse
         result = []
-        tree = fromstring(self.get_response())
+        tree = fromstring(self.response)
         for plan in tree.getiterator('subscriber'):
             data = {
                 'customer_id': int(plan.findtext('customer-id')),
@@ -171,7 +173,7 @@ class Client:
 
         # Parse
         result = []
-        tree = fromstring(self.get_response())
+        tree = fromstring(self.response)
         for plan in tree.getiterator('subscriber'):
             data = {
                 'customer_id': int(plan.findtext('customer-id')),
@@ -225,7 +227,7 @@ class Client:
 
         # Parse
         result = []
-        tree = fromstring(self.get_response())
+        tree = fromstring(self.response)
         for plan in tree.getiterator('subscriber'):
             data = {
                 'customer_id': int(plan.findtext('customer-id')),
