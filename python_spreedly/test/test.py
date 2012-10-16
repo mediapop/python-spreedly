@@ -3,11 +3,10 @@ from __future__ import absolute_import
 import unittest
 import requests
 from python_spreedly.api import Client
+from . site_conf import SPREEDLY_AUTH_TOKEN, SPREEDLY_SITE_NAME
 
 #TODO find a robust way of doing this without one person's tokens/names
 # hard coded
-SPREEDLY_AUTH_TOKEN = '59f064f450af88df24f54281f3d78ad8ee0eb8f0'
-SPREEDLY_SITE_NAME = 'shelfworthytest'
 
 # Create some plans in your test site
 
@@ -76,7 +75,7 @@ class  SpreedlyTests(unittest.TestCase):
         subscriber = self.sclient.create_subscriber(1, 'test')
 
         # Subscribe to a free trial
-        subscription = self.sclient.subscribe(1, 1824, True)
+        subscription = self.sclient.subscribe(1, 21431)
         self.assertEquals(set(subscriber.keys()), keys)
         self.assertTrue(subscription['trial_active'])
 

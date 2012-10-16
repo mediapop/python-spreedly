@@ -1,11 +1,10 @@
-import httplib, urllib2, time, calendar
-from urlparse import urljoin, urlparse
+import time, calendar
+from urlparse import urljoin
 import requests
 from datetime import datetime
 from decimal import Decimal
 from xml.etree.ElementTree import fromstring
 from xml.etree import ElementTree as ET
-from base64 import b64encode
 
 API_VERSION = 'v4'
 
@@ -17,7 +16,10 @@ def utc_to_local(dt):
 
 
 def str_to_datetime(s):
-    ''' Converts ISO 8601 string (2009-11-10T21:11Z) to LOCAL datetime'''
+    ''' Converts ISO 8601 string (2009-11-10T21:11Z) to LOCAL datetime,
+    or returns None if None is passed'''
+    if not s:  #TODO am I on crack?
+        return None
     return utc_to_local(datetime.strptime(s, '%Y-%m-%dT%H:%M:%SZ'))
 
 #TODO - more coherent mapping to parse the XML in different methods
@@ -32,12 +34,53 @@ class Client(object):
     """
 
     def __init__(self, token, site_name):
-        self.auth = b64encode('{token}'.format(token=token))
+        self.auth = token
         self.base_host = 'https://spreedly.com'
-        self.base_path = '/api/{api_version}/{site_name}'.format(
+        self.base_path = '/api/{api_version}/{site_name}/'.format(
                 api_version=API_VERSION, site_name=site_name)
         self.base_url = urljoin(self.base_host,self.base_path)
         self.url = None
+
+    def _ft(self, tree):
+        def ft(x):
+            try:
+                return tree.findtext(x)
+            except:
+                None
+        return ft
+
+    def _get_parsed_subscriber(self, tree):
+        """
+        returns a dictionary containing a parsed subscriber tree. lazily.
+        The following when called, will genarate a dictionary that will
+        lazily parse the the given tree tags for their values
+        yeah - This kind of just happened this way
+        usage:
+        data = self._get_parsed_subscriber(subscriber_tree)
+        """
+#TODO - when I sort out the keys - make most of this annoying stuff go away
+        ft = self._ft(tree)
+        truth = lambda x: x == 'true'
+        return {
+            'customer_id': int(ft('customer-id')),
+            'first_name': ft('billing-first-name'),
+            'last_name': ft('billing-first-name'),
+            'active': truth(ft('active')),
+            'active': truth(ft('on-trial')),
+            'trial_elegible': truth(ft('eligible-for-free-trial')),
+            'lifetime': truth(ft('lifetime-subscription')),
+            'recurring': truth(ft('recurring')),
+            'card_expires_before_next_auto_renew': truth(ft('card-expires-before-nex-auto-renew')),
+            'token': ft('token'),
+            'name': ft('subscription-plan-name'),
+            'feature_level': ft('feature-level'),
+            'created_at': str_to_datetime(ft('created-at')),
+            'date_changed': str_to_datetime(ft('updated-at')),
+            'active_until': str_to_datetime(ft('active_until')),
+            'email': ft('email'),
+            'screen_name': ft('screen-name'),
+        }
+
 
     def query(self, url, data=None, action='get'):
         """ .. py:method:: query(url[, data=None, put='get'])
@@ -62,13 +105,14 @@ class Client(object):
             raise NotImplementedError()
         url = urljoin(self.base_url, url)
         headers = {
-                'User-Agent': 'python-spreedly 1.0',
+                'User-Agent': 'python-spreedly 1.1',
                 }
         if action in ('put','post'):
             headers['Content-Type'] = 'application/xml'
         auth = (self.auth,'X')
-        return getattr(requests, action)(url, auth=auth, headers=headers,
+        response = getattr(requests, action)(url, auth=auth, headers=headers,
                                              data=data)
+        return response
 
 
     def get_plans(self):
@@ -113,6 +157,7 @@ class Client(object):
             }
             result.append(data)
         return result
+
     ## Subscriber manipulation
     def create_subscriber(self, customer_id, screen_name):
         ''' .. py:method::create_subscriber(customer_id, screen_name)
@@ -134,34 +179,7 @@ class Client(object):
         result = []
         tree = fromstring(response.text)
         for plan in tree.getiterator('subscriber'):
-            data = {
-                'customer_id': int(plan.findtext('customer-id')),
-                'first_name': plan.findtext('billing-first-name'),
-                'last_name': plan.findtext('billing-last-name'),
-                'active': True if plan.findtext('active') == 'true' else False,
-                'gift': True if plan.findtext('on-gift') == 'true' else False,
-                'trial_active': \
-                    True if plan.findtext('on-trial') == 'true' else False,
-                'trial_elegible': \
-                    True if plan.findtext('eligible-for-free-trial') == 'true' \
-                    else False,
-                'lifetime': \
-                    True if plan.findtext('lifetime-subscription') == 'true' \
-                    else False,
-                'recurring': \
-                    True if plan.findtext('recurring') == 'true' \
-                    else False,
-                'card_expires_before_next_auto_renew': \
-                    True if plan.findtext('card-expires-before-next-auto-renew') == 'true' \
-                    else False,
-                'token': plan.findtext('token'),
-                'name': plan.findtext('subscription-plan-name'),
-                'feature_level': plan.findtext('feature-level'),
-                'created_at': str_to_datetime(plan.findtext('created-at')),
-                'date_changed': str_to_datetime(plan.findtext('updated-at')),
-                'active_until': str_to_datetime(plan.findtext('active-until')) if plan.findtext('active-until') else None,
-            }
-
+            data = self._get_parsed_subscriber(plan)
             result.append(data)
         # Why are we parsing the entire dataset just to return the first?
         return result[0]
@@ -192,7 +210,7 @@ class Client(object):
         data = '''
         <subscription_plan>
             <id>{plan_id}</id>
-        </subscription_plan>'''.format(id=plan_id)
+        </subscription_plan>'''.format(plan_id=plan_id)
 
         url = 'subscribers/{id}/subscribe_to_free_trial.xml'.format(id=subscriber_id)
         response = self.query(url, data, action='post')
@@ -201,33 +219,7 @@ class Client(object):
         result = []
         tree = fromstring(response.text)
         for plan in tree.getiterator('subscriber'):
-            data = {
-                'customer_id': int(plan.findtext('customer-id')),
-                'first_name': plan.findtext('billing-first-name'),
-                'last_name': plan.findtext('billing-last-name'),
-                'active': True if plan.findtext('active') == 'true' else False,
-                'gift': True if plan.findtext('on-gift') == 'true' else False,
-                'trial_active': \
-                    True if plan.findtext('on-trial') == 'true' else False,
-                'trial_elegible': \
-                    True if plan.findtext('eligible-for-free-trial') == 'true' \
-                    else False,
-                'lifetime': \
-                    True if plan.findtext('lifetime-subscription') == 'true' \
-                    else False,
-                'recurring': \
-                    True if plan.findtext('recurring') == 'true' \
-                    else False,
-                'card_expires_before_next_auto_renew': \
-                    True if plan.findtext('card-expires-before-next-auto-renew') == 'true' \
-                    else False,
-                'token': plan.findtext('token'),
-                'name': plan.findtext('subscription-plan-name'),
-                'feature_level': plan.findtext('feature-level'),
-                'created_at': str_to_datetime(plan.findtext('created-at')),
-                'date_changed': str_to_datetime(plan.findtext('updated-at')),
-                'active_until': str_to_datetime(plan.findtext('active-until')) if plan.findtext('active-until') else None,
-            }
+            data = self._get_parsed_subscriber(plan)
             result.append(data)
         return result[0]
 
@@ -247,37 +239,9 @@ class Client(object):
 
         # Parse
         result = []
-        tree = fromstring(response)
+        tree = fromstring(response.text)
         for plan in tree.getiterator('subscriber'):
-            data = {
-                'customer_id': int(plan.findtext('customer-id')),
-                'email': plan.findtext('email'),
-                'screen_name': plan.findtext('screen-name'),
-                'first_name': plan.findtext('billing-first-name'),
-                'last_name': plan.findtext('billing-last-name'),
-                'active': True if plan.findtext('active') == 'true' else False,
-                'gift': True if plan.findtext('on-gift') == 'true' else False,
-                'trial_active': \
-                    True if plan.findtext('on-trial') == 'true' else False,
-                'trial_elegible': \
-                    True if plan.findtext('eligible-for-free-trial') == 'true' \
-                    else False,
-                'lifetime': \
-                    True if plan.findtext('lifetime-subscription') == 'true' \
-                    else False,
-                'recurring': \
-                    True if plan.findtext('recurring') == 'true' \
-                    else False,
-                'card_expires_before_next_auto_renew': \
-                    True if plan.findtext('card-expires-before-next-auto-renew') == 'true' \
-                    else False,
-                'token': plan.findtext('token'),
-                'name': plan.findtext('subscription-plan-name'),
-                'feature_level': plan.findtext('feature-level'),
-                'created_at': str_to_datetime(plan.findtext('created-at')),
-                'date_changed': str_to_datetime(plan.findtext('updated-at')),
-                'active_until': str_to_datetime(plan.findtext('active-until')) if plan.findtext('active-until') else None,
-            }
+            data = self._get_parsed_subscriber(plan)
             result.append(data)
         return result[0]
 
@@ -285,6 +249,9 @@ class Client(object):
         """ .. py:method: set_info(subscriber_id[, **kw])
         this corrisponds to the update-subscriber action. passed kw args are
         placed into the xml data (not sure how the -/_ are dealt with though)
+
+        There is a design flaw atm where sclient.set_info(sclient.get_info(123))
+        will not work at all as the keys are all different
         """
         root = ET.Element('subscriber')
 
@@ -293,7 +260,7 @@ class Client(object):
             e.text = value
 
         url = 'subscribers/{id}.xml'.format(id=subscriber_id)
-        self.query(data=ET.tostring(root), action='put')
+        self.query(url, data=ET.tostring(root), action='put')
 
     def create_complimentary_subscription(self, subscriber_id,
             duration, duration_units, feature_level,
@@ -378,7 +345,7 @@ class Client(object):
         """
         if 'test' in self.base_path:
             url = "{id}.xml".format(id=id)
-            response = self.request(url,action='delete')
+            response = self.query(url,action='delete')
             return response.status_code
         return
 
