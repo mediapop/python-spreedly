@@ -37,6 +37,8 @@ def parse_element(element):
 
 
 def objectify_spreedly(xml):
+    if not hasattr(xml, 'read'):
+        xml = StringIO(xml)
     tree = ET.parse(xml)
     data = parse_element(tree.getroot())
     return data
