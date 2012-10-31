@@ -5,6 +5,7 @@ from datetime import datetime
 from decimal import Decimal
 from xml.etree.ElementTree import fromstring
 from xml.etree import ElementTree as ET
+from objectify import objectify_spreedly
 
 API_VERSION = 'v4'
 
@@ -70,7 +71,7 @@ class Client(object):
             'trial_elegible': truth(ft('eligible-for-free-trial')),
             'lifetime': truth(ft('lifetime-subscription')),
             'recurring': truth(ft('recurring')),
-            'card_expires_before_next_auto_renew': truth(ft('card-expires-before-nex-auto-renew')),
+            'card_expires_before_next_auto_renew': truth(ft('card-expires-before-next-auto-renew')),
             'token': ft('token'),
             'name': ft('subscription-plan-name'),
             'feature_level': ft('feature-level'),
@@ -129,33 +130,35 @@ class Client(object):
             raise e
 
         # Parse
-        result = []
-        tree = fromstring(response.text)
-        for plan in tree.getiterator('subscription-plan'):
-            data = {
-                'name': plan.findtext('name'),
-                'description': plan.findtext('description'),
-                'terms': plan.findtext('terms'),
-                'plan_type': plan.findtext('plan-type'),
-                'price': Decimal(plan.findtext('price')),
-                'enabled': True if plan.findtext('enabled') == 'true' else False,
-                'force_recurring': \
-                    True if plan.findtext('force-recurring') == 'true' else False,
-                'force_renew': \
-                    True if plan.findtext('needs-to-be-renewed') == 'true' else False,
-                'duration': int(plan.findtext('duration-quantity')),
-                'duration_units': plan.findtext('duration-units'),
-                'feature_level': plan.findtext('feature-level'),
-                'return_url': plan.findtext('return-url'),
-                'version': int(plan.findtext('version')) \
-                    if plan.findtext('version') else 0,
-                'speedly_id': int(plan.findtext('id')),
-                'speedly_site_id': int(plan.findtext('site-id')) \
-                    if plan.findtext('site-id') else 0,
-                'created_at': str_to_datetime(plan.findtext('created-at')),
-                'date_changed': str_to_datetime(plan.findtext('updated-at')),
-            }
-            result.append(data)
+        result = objectify_spreedly(response.text)
+## Left in for reference as I haven't read this closesly
+#        result = []
+#        tree = fromstring(response.text)
+#        for plan in tree.getiterator('subscription-plan'):
+#            data = {
+#                'name': plan.findtext('name'),
+#                'description': plan.findtext('description'),
+#                'terms': plan.findtext('terms'),
+#                'plan_type': plan.findtext('plan-type'),
+#                'price': Decimal(plan.findtext('price')),
+#                'enabled': True if plan.findtext('enabled') == 'true' else False,
+#                'force_recurring': \
+#                    True if plan.findtext('force-recurring') == 'true' else False,
+#                'force_renew': \
+#                    True if plan.findtext('needs-to-be-renewed') == 'true' else False,
+#                'duration': int(plan.findtext('duration-quantity')),
+#                'duration_units': plan.findtext('duration-units'),
+#                'feature_level': plan.findtext('feature-level'),
+#                'return_url': plan.findtext('return-url'),
+#                'version': int(plan.findtext('version')) \
+#                    if plan.findtext('version') else 0,
+#                'speedly_id': int(plan.findtext('id')),
+#                'speedly_site_id': int(plan.findtext('site-id')) \
+#                    if plan.findtext('site-id') else 0,
+#                'created_at': str_to_datetime(plan.findtext('created-at')),
+#                'date_changed': str_to_datetime(plan.findtext('updated-at')),
+#            }
+#            result.append(data)
         return result
 
     ## Subscriber manipulation
@@ -176,13 +179,7 @@ class Client(object):
         response = self.query(url='subscribers.xml',data=data, action='post')
 
         # Parse
-        result = []
-        tree = fromstring(response.text)
-        for plan in tree.getiterator('subscriber'):
-            data = self._get_parsed_subscriber(plan)
-            result.append(data)
-        # Why are we parsing the entire dataset just to return the first?
-        return result[0]
+        return objectify_spreedly(response.text)
 
     def get_signup_url(self, subscriber_id, plan_id, screen_name):
         ''' .. py:method:: get_signup_url(subscriber_id, plan_id, screen_name)
@@ -216,12 +213,7 @@ class Client(object):
         response = self.query(url, data, action='post')
 
         # Parse
-        result = []
-        tree = fromstring(response.text)
-        for plan in tree.getiterator('subscriber'):
-            data = self._get_parsed_subscriber(plan)
-            result.append(data)
-        return result[0]
+        return objectify_spreedly(response.text)
 
     def get_info(self, subscriber_id):
         """ .. py:method:: get_info(subscriber_id)
@@ -238,12 +230,7 @@ class Client(object):
             raise e
 
         # Parse
-        result = []
-        tree = fromstring(response.text)
-        for plan in tree.getiterator('subscriber'):
-            data = self._get_parsed_subscriber(plan)
-            result.append(data)
-        return result[0]
+        return objectify_spreedly(response.text)
 
     def set_info(self, subscriber_id, **kw):
         """ .. py:method: set_info(subscriber_id[, **kw])
