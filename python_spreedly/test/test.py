@@ -275,12 +275,13 @@ class  SpreedlyTests(unittest.TestCase):
             ])
         #test non existent subscriber
         result = self.sclient.get_or_create_subscriber(123, 'tester')
-        self.assertEquals(set(result.keys()), keys)
+        self.assertTrue(set(result.keys()) == keys)
 
         self.maxDiff =None
         #assure that we won't overwrite existing subscriber
         result2 = self.sclient.get_or_create_subscriber(123, 'tester2')
-        self.assertEquals(result, result2)
+        diffset = [k for k in result if result2[k] != result[k]]
+        self.assertFalse(diffset)
 
 
     def test_comp_subscription(self):

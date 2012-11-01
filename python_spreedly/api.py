@@ -179,9 +179,7 @@ class Client(object):
         response = self.query(url='subscribers.xml',data=data, action='post')
 
         # Parse
-        data = objectify_spreedly(response.text)
-        data['customer_id'] = int(data['customer_id'])
-        return data
+        return objectify_spreedly(response.text)
 
     def get_signup_url(self, subscriber_id, plan_id, screen_name):
         ''' .. py:method:: get_signup_url(subscriber_id, plan_id, screen_name)
@@ -215,9 +213,7 @@ class Client(object):
         response = self.query(url, data, action='post')
 
         # Parse
-        data = objectify_spreedly(response.text)
-        data['customer_id'] = int(data['customer_id'])
-        return data
+        return objectify_spreedly(response.text)
 
     def get_info(self, subscriber_id):
         """ .. py:method:: get_info(subscriber_id)

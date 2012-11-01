@@ -48,7 +48,7 @@ def objectify_spreedly(xml):
     for key in ['customer_id', 'pagination_id',]:
         try:
             data[key] = int(data[key])
-        except KeyError:
+        except (KeyError, TypeError):
             pass
     return data
 
