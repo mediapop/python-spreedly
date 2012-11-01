@@ -13,6 +13,7 @@ _types = {
     'datetime' :  lambda s: datetime.strptime(s, '%Y-%m-%dT%H:%M:%SZ') if s else None,
     'decimal'  :  float,
     'boolean'  :  lambda x: x == 'true',
+    'array'    :  lambda x: [],  ## Return an empty array
     }
 
 
@@ -33,14 +34,22 @@ def parse_element(element):
         return { name : children}
     if _types['boolean'](element.attrib.get('nil',False)):
         return {name: None}
-    return {name: _types[data_type](element.text)}
+    try:
+        return {name: _types[data_type](element.text)}
+    except KeyError:
+        return {name: element.text} ## You are something strange and are now a string
 
 
 def objectify_spreedly(xml):
     if not hasattr(xml, 'read'):
-        xml = StringIO(xml)
-    tree = ET.parse(xml)
-    data = parse_element(tree.getroot())
+        xml_io = StringIO(xml)
+    tree = ET.parse(xml_io)
+    data = parse_element(tree.getroot())[_sub_dash.sub('_',tree.getroot().tag)]
+    for key in ['customer_id', 'pagination_id',]:
+        try:
+            data[key] = int(data[key])
+        except KeyError:
+            pass
     return data
 
 
