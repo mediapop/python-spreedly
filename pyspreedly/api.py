@@ -2,10 +2,11 @@ import time, calendar
 from urlparse import urljoin
 import requests
 from datetime import datetime
-from decimal import Decimal
-from xml.etree.ElementTree import fromstring
 from xml.etree import ElementTree as ET
 from objectify import objectify_spreedly
+
+__all__ = [
+        'API_VERSION', 'Client', ]
 
 API_VERSION = 'v4'
 
