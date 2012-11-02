@@ -174,7 +174,7 @@ class  SpreedlyTests(unittest.TestCase):
         self.assertTrue(subscription['on_trial'])
 
     def test_delete_subscriber(self):
-        self.sclient.create_subscriber(1, 'test')
+        subscriber = self.sclient.create_subscriber(1, 'test')
         self.failUnlessEqual(self.sclient.delete_subscriber(1), 200)
         try:
             self.sclient.get_info(1)

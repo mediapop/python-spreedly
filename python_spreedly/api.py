@@ -331,7 +331,7 @@ class Client(object):
         :returns: status code
         """
         if 'test' in self.base_path:
-            url = "{id}.xml".format(id=id)
+            url = "subscribers/{id}.xml".format(id=id)
             response = self.query(url,action='delete')
             return response.status_code
         return
