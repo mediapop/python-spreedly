@@ -182,7 +182,7 @@ class Client(object):
         # Parse
         return objectify_spreedly(response.text)
 
-    def get_signup_url(self, subscriber_id, plan_id, screen_name):
+    def get_signup_url(self, subscriber_id, plan_id, screen_name, token=None):
         ''' .. py:method:: get_signup_url(subscriber_id, plan_id, screen_name)
         Subscribe a user to the site plan on a free trial
 
@@ -190,11 +190,19 @@ class Client(object):
         :param subscriber_id: ID of the subscriber
         :param plan_id: subscription plan ID
         :param screen_name: user screen name
+        :param token: customer token or None - if passed use the token version
+            of the url
         :returns: url for subscription
         '''
-        return 'subscribers/{id}/subscribe/{plan_id}/{screen_name}'.format(
-                id=subscriber_id, plan_id=plan_id,
-                screen_name=screen_name)
+        subscriber_id = str(subscriber_id)
+        plan_id = str(plan_id)
+        if token:
+            url = '/'.join(('subscribers',subscriber_id,token,
+                'subscribe', plan_id))
+        else:
+            url = '/'.join(('subscribers',subscriber_id,'subscribe',
+                plan_id,screen_name))
+        return url
 
     def subscribe(self, subscriber_id, plan_id=None):
         ''' .. py:method:: subscribe(subscriber_id, plan_id)

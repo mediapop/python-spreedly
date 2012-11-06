@@ -2,7 +2,7 @@
 from __future__ import absolute_import
 import unittest
 import requests
-from python_spreedly.api import Client
+from pyspreedly.api import Client
 from . site_conf import SPREEDLY_AUTH_TOKEN, SPREEDLY_SITE_NAME
 from pprint import pprint
 
@@ -233,6 +233,21 @@ class  SpreedlyTests(unittest.TestCase):
         subscriber = self.sclient.get_info(1)
         self.assertEquals(subscriber['email'], 'jack@bauer.com')
         self.assertEquals(subscriber['screen_name'], 'jb')
+
+
+    def test_get_signup_url(self):
+        norm_url = 'subscribers/44763/subscribe/41/screen-name-for-44763'
+        tokened_url = 'subscribers/44763/d21de2b33ed811c1a040a507988241f550c45aee/subscribe/41'
+        cust_id = 44763
+        token = 'd21de2b33ed811c1a040a507988241f550c45aee'
+        screen_name = 'screen-name-for-44763'
+        plan_id = 41
+        test_url = self.sclient.get_signup_url(cust_id, plan_id, screen_name)
+        self.assertEquals(test_url, norm_url)
+        test_url = self.sclient.get_signup_url(cust_id, plan_id, screen_name,token)
+        self.assertEquals(test_url, tokened_url)
+
+
 
 
     def test_get_or_create(self):
