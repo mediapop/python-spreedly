@@ -51,39 +51,6 @@ class Client(object):
                 None
         return ft
 
-    def _get_parsed_subscriber(self, tree):
-        """
-        returns a dictionary containing a parsed subscriber tree. lazily.
-        The following when called, will genarate a dictionary that will
-        lazily parse the the given tree tags for their values
-        yeah - This kind of just happened this way
-        usage:
-        data = self._get_parsed_subscriber(subscriber_tree)
-        """
-#TODO - when I sort out the keys - make most of this annoying stuff go away
-        ft = self._ft(tree)
-        truth = lambda x: x == 'true'
-        return {
-            'customer_id': int(ft('customer-id')),
-            'first_name': ft('billing-first-name'),
-            'last_name': ft('billing-first-name'),
-            'active': truth(ft('active')),
-            'active': truth(ft('on-trial')),
-            'trial_elegible': truth(ft('eligible-for-free-trial')),
-            'lifetime': truth(ft('lifetime-subscription')),
-            'recurring': truth(ft('recurring')),
-            'card_expires_before_next_auto_renew': truth(ft('card-expires-before-next-auto-renew')),
-            'token': ft('token'),
-            'name': ft('subscription-plan-name'),
-            'feature_level': ft('feature-level'),
-            'created_at': str_to_datetime(ft('created-at')),
-            'date_changed': str_to_datetime(ft('updated-at')),
-            'active_until': str_to_datetime(ft('active_until')),
-            'email': ft('email'),
-            'screen_name': ft('screen-name'),
-        }
-
-
     def query(self, url, data=None, action='get'):
         """ .. py:method:: query(url[, data=None, put='get'])
 
@@ -116,7 +83,6 @@ class Client(object):
                                              data=data)
         return response
 
-
     def get_plans(self):
         """ .. py:method::get_plans()
         get subscription plans for the configured site
@@ -132,34 +98,6 @@ class Client(object):
 
         # Parse
         result = objectify_spreedly(response.text)
-## Left in for reference as I haven't read this closesly
-#        result = []
-#        tree = fromstring(response.text)
-#        for plan in tree.getiterator('subscription-plan'):
-#            data = {
-#                'name': plan.findtext('name'),
-#                'description': plan.findtext('description'),
-#                'terms': plan.findtext('terms'),
-#                'plan_type': plan.findtext('plan-type'),
-#                'price': Decimal(plan.findtext('price')),
-#                'enabled': True if plan.findtext('enabled') == 'true' else False,
-#                'force_recurring': \
-#                    True if plan.findtext('force-recurring') == 'true' else False,
-#                'force_renew': \
-#                    True if plan.findtext('needs-to-be-renewed') == 'true' else False,
-#                'duration': int(plan.findtext('duration-quantity')),
-#                'duration_units': plan.findtext('duration-units'),
-#                'feature_level': plan.findtext('feature-level'),
-#                'return_url': plan.findtext('return-url'),
-#                'version': int(plan.findtext('version')) \
-#                    if plan.findtext('version') else 0,
-#                'speedly_id': int(plan.findtext('id')),
-#                'speedly_site_id': int(plan.findtext('site-id')) \
-#                    if plan.findtext('site-id') else 0,
-#                'created_at': str_to_datetime(plan.findtext('created-at')),
-#                'date_changed': str_to_datetime(plan.findtext('updated-at')),
-#            }
-#            result.append(data)
         return result
 
     ## Subscriber manipulation
@@ -202,6 +140,7 @@ class Client(object):
         else:
             url = '/'.join(('subscribers',subscriber_id,'subscribe',
                 plan_id,screen_name))
+        url = urljoin(self.base_url, url)
         return url
 
     def subscribe(self, subscriber_id, plan_id=None):
@@ -240,6 +179,28 @@ class Client(object):
 
         # Parse
         return objectify_spreedly(response.text)
+
+    def add_fee(self, subscriber_id, name, description, group, amount):
+        """ .. py:method:: add_fee(subscriber_id, name, description, group, amount)
+        Add a fee to a user with subscriber_id
+        :param subscriber_id: the id of the subscriber
+        :param name: the name of the fee (eg - Excess Bandwidth Charge)
+        :param description: a description of the charge
+        :param group: a group to add this charge too
+        :param amount: the amount the charge is for
+        :returns: status code that is passed back from spreedly
+        """
+        data = """
+        <fee>
+          <name>{name}</name>
+          <description>{description}</description>
+          <group>{group}</amount>
+          <amount>{amount}</amount>
+        </fee>
+        """.format(name=name, description=description, group=group, amount=amount)
+        url = 'subscribers/{id}/fees.xml'.format(id=subscriber_id)
+        response = self.query(url,data, action='post')
+        return response.status_code
 
     def set_info(self, subscriber_id, **kw):
         """ .. py:method: set_info(subscriber_id[, **kw])

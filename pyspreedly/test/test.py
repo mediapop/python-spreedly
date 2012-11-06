@@ -2,6 +2,7 @@
 from __future__ import absolute_import
 import unittest
 import requests
+from urlparse import urljoin
 from pyspreedly.api import Client
 from . site_conf import SPREEDLY_AUTH_TOKEN, SPREEDLY_SITE_NAME
 from pprint import pprint
@@ -236,18 +237,16 @@ class  SpreedlyTests(unittest.TestCase):
 
 
     def test_get_signup_url(self):
-        norm_url = 'subscribers/44763/subscribe/41/screen-name-for-44763'
-        tokened_url = 'subscribers/44763/d21de2b33ed811c1a040a507988241f550c45aee/subscribe/41'
+        norm_url = urljoin(self.sclient.base_url,'subscribers/44763/subscribe/41/screen-name-for-44763')
+        tokened_url = urljoin(self.sclient.base_url, 'subscribers/44763/d21de2b33ed811c1a040a507988241f550c45aee/subscribe/41')
         cust_id = 44763
         token = 'd21de2b33ed811c1a040a507988241f550c45aee'
         screen_name = 'screen-name-for-44763'
         plan_id = 41
         test_url = self.sclient.get_signup_url(cust_id, plan_id, screen_name)
-        self.assertEquals(test_url, norm_url)
+        self.assertEquals(urljoin(self.sclient.base_url,test_url), norm_url)
         test_url = self.sclient.get_signup_url(cust_id, plan_id, screen_name,token)
-        self.assertEquals(test_url, tokened_url)
-
-
+        self.assertEquals(urljoin(self.sclient.base_url,test_url), tokened_url)
 
 
     def test_get_or_create(self):
@@ -305,6 +304,11 @@ class  SpreedlyTests(unittest.TestCase):
         self.sclient.create_complimentary_subscription(123, 2, 'months', 'Pro')
         # Probelm with asserting comp details here - the assigned time
         # seems kinda fuzzy
+
+    def test_add_fee(self):
+        result = self.sclient.add_fee(name='Test Fee', description='A Test Levy',
+                group='test fees', amount=24.0)
+        self.assertEquals(result, 201)
 
 
 if __name__ == '__main__':
