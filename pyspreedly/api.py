@@ -188,6 +188,23 @@ class Client(object):
         # Parse
         return objectify_spreedly(response.text)
 
+    def allow_free_trial(self, subscriber_id):
+        """ .. py:method:: allow_free_trial(subscriber_id)
+
+        programatically allow for a new free trial
+        :param subscriber_id: the id of the subscriber
+        :returns: subscriber data as dictionary if all good,
+        :raises: HTTPError if not so good (non-200)
+        """
+        url = 'subscribers/{id}/allow_free_trial.xml'.format(id=subscriber_id)
+        response = self.query(url,'', action='post')
+        if response.status_code is not 200:
+            raise requests.HTTPError('status; {0}, text {1}'.format(
+                response.status_code, response.text))
+        else:
+            return objectify_spreedly(response.text)
+
+
     def add_fee(self, subscriber_id, name, description, group, amount):
         """ .. py:method:: add_fee(subscriber_id, name, description, group, amount)
         Add a fee to a user with subscriber_id
