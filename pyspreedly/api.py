@@ -150,11 +150,11 @@ class Client(object):
         ''' .. py:method:: subscribe(subscriber_id, plan_id)
         Subscribe a user to the site plan on a free trial
 
-        subscribe a user to a plan, either trial or not
+        subscribe a user to a free trial plan.
         :param subscriber_id: ID of the subscriber
         :parma plan_id: subscription plan ID
         :returns: dictionary with xml data if all is good
-        :raises: HTTPError if response status not 201
+        :raises: HTTPError if response status not 200
         '''
         #TODO - This lacks subscription for a site to a plan_id.
         data = '''
@@ -165,7 +165,7 @@ class Client(object):
         url = 'subscribers/{id}/subscribe_to_free_trial.xml'.format(id=subscriber_id)
         response = self.query(url, data, action='post')
 
-        if response.status_code != 201:
+        if response.status_code != 200:
             raise requests.HTTPError("status code: {0}, text: {1}".format(response.status_code, response.text))
 
         # Parse
