@@ -306,9 +306,11 @@ class  SpreedlyTests(unittest.TestCase):
         # seems kinda fuzzy
 
     def test_add_fee(self):
-        result = self.sclient.add_fee(name='Test Fee', description='A Test Levy',
+        # trial user cannot have fees.
+        subscriber = self.sclient.get_or_create_subscriber(123, 'tester')
+        result = self.sclient.add_fee(subscriber_id=123,name='Test Fee', description='A Test Levy',
                 group='test fees', amount=24.0)
-        self.assertEquals(result, 201)
+        self.assertEquals(result, 422)
 
 
 if __name__ == '__main__':
