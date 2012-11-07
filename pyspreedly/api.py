@@ -202,7 +202,7 @@ class Client(object):
         <fee>
           <name>{name}</name>
           <description>{description}</description>
-          <group>{group}</amount>
+          <group>{group}</group>
           <amount>{amount}</amount>
         </fee>
         """.format(name=name, description=description, group=group, amount=amount)
