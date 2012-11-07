@@ -107,6 +107,7 @@ class Client(object):
         :param customer_id: Customer ID
         :param screen_name: Customer's screen name
         :returns: Data for created customer
+        :raises: HTTPError if response code isn't 201
         '''
         data = '''
         <subscriber>
@@ -118,6 +119,8 @@ class Client(object):
         response = self.query(url='subscribers.xml',data=data, action='post')
 
         # Parse
+        if not response.status_code == 201:
+            raise requests.HTTPError(response)
         return objectify_spreedly(response.text)
 
     def get_signup_url(self, subscriber_id, plan_id, screen_name, token=None):
