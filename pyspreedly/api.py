@@ -213,7 +213,7 @@ class Client(object):
         :param description: a description of the charge
         :param group: a group to add this charge too
         :param amount: the amount the charge is for
-        :returns: status code that is passed back from spreedly
+        :returns: the response object
         """
         data = """
         <fee>
@@ -225,7 +225,7 @@ class Client(object):
         """.format(name=name, description=description, group=group, amount=amount)
         url = 'subscribers/{id}/fees.xml'.format(id=subscriber_id)
         response = self.query(url,data, action='post')
-        return response.status_code
+        return response
 
     def set_info(self, subscriber_id, **kw):
         """ .. py:method: set_info(subscriber_id[, **kw])
