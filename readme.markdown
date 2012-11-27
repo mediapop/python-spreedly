@@ -1,14 +1,15 @@
 A python API for the spreedly subscription service.
 ===================================================
 
-This wrapper is currently not complete, and currently serves more as a backend for [django-paid-subscriptions](https://github.com/chrisdrackett/django-paid-subscriptions).
+This is an api wrapper for [spreedly](http://spreedly.com).  It is not complete, and is primarily used as a backend for [django-spreedly](http://github.com/mediapop/django-spreedly).
 
-However the plan is that this should be able to stand alone to use the spreedly service with any python project.
+It is intended to be turned into a general python api that is usable for any project.
 
 Todo:
 =====
 
 * add support for sending a user to spreedly to sign up for a subscription
 * add support for checking if a subscription for a user has been activated
+* update these docs
 
-Please raise all issues with this project at our [lighthouse](http://chrisdrackett.lighthouseapp.com/projects/39822-python-django-spreedly) page.
+Please report all issues to our git hub [issue tracker](https://github.com/mediapop/python-spreedly/issues)
