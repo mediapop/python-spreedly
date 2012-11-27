@@ -20,6 +20,19 @@ _types = {
 
 
 def parse_element(element):
+    """
+    Recursivly parses an element of the xml node depth first.  Turns all xml tags to
+    underscore instead of dashes.
+    Handles all types in `_types` (string, integer datetime, decimal, boolean,
+    array).  Every other type is treated as a string.  There are some damn odd
+    types in the data passed.
+    Warning - this doesn't check that the data is what it should be, or that
+    stuff is not being added.
+
+    :param element: :py:class:`ElementTree` element.
+    :returns: dictionary of the data (unordered but with correct heirarchy).
+    :raises: :py:exc:`MaximumRecursionDepthExceeded` if you do pass some crazy huge and deap XML tree
+    """
     children = {}
     data_type = element.attrib.get('type','string')
     children = [] if data_type == 'array' else {}  # change how depth is handled
@@ -42,6 +55,14 @@ def parse_element(element):
 
 
 def objectify_spreedly(xml):
+    """
+    Does some high level stuff to the XML tree, and then passes it off to
+    :py:func:`parse_element` to get the data back as a dictionary.  Truth
+    be told it is not really objectifying spreedly, but turning it into a
+    dictionary.
+
+    :param xml: xml string or file object.  If it is a string, it is turned into :py:class:`StringIO`.
+    """
     if not hasattr(xml, 'read'):
         xml_io = StringIO(xml)
     tree = ET.parse(xml_io)
