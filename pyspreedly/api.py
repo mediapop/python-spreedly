@@ -2,9 +2,11 @@ import time, calendar
 from urlparse import urljoin
 import requests
 from datetime import datetime
-from decimal import Decimal
-from xml.etree.ElementTree import fromstring
 from xml.etree import ElementTree as ET
+from objectify import objectify_spreedly
+
+__all__ = [
+        'API_VERSION', 'Client', ]
 
 API_VERSION = 'v4'
 
@@ -49,39 +51,6 @@ class Client(object):
                 None
         return ft
 
-    def _get_parsed_subscriber(self, tree):
-        """
-        returns a dictionary containing a parsed subscriber tree. lazily.
-        The following when called, will genarate a dictionary that will
-        lazily parse the the given tree tags for their values
-        yeah - This kind of just happened this way
-        usage:
-        data = self._get_parsed_subscriber(subscriber_tree)
-        """
-#TODO - when I sort out the keys - make most of this annoying stuff go away
-        ft = self._ft(tree)
-        truth = lambda x: x == 'true'
-        return {
-            'customer_id': int(ft('customer-id')),
-            'first_name': ft('billing-first-name'),
-            'last_name': ft('billing-first-name'),
-            'active': truth(ft('active')),
-            'active': truth(ft('on-trial')),
-            'trial_elegible': truth(ft('eligible-for-free-trial')),
-            'lifetime': truth(ft('lifetime-subscription')),
-            'recurring': truth(ft('recurring')),
-            'card_expires_before_next_auto_renew': truth(ft('card-expires-before-nex-auto-renew')),
-            'token': ft('token'),
-            'name': ft('subscription-plan-name'),
-            'feature_level': ft('feature-level'),
-            'created_at': str_to_datetime(ft('created-at')),
-            'date_changed': str_to_datetime(ft('updated-at')),
-            'active_until': str_to_datetime(ft('active_until')),
-            'email': ft('email'),
-            'screen_name': ft('screen-name'),
-        }
-
-
     def query(self, url, data=None, action='get'):
         """ .. py:method:: query(url[, data=None, put='get'])
 
@@ -114,7 +83,6 @@ class Client(object):
                                              data=data)
         return response
 
-
     def get_plans(self):
         """ .. py:method::get_plans()
         get subscription plans for the configured site
@@ -129,33 +97,7 @@ class Client(object):
             raise e
 
         # Parse
-        result = []
-        tree = fromstring(response.text)
-        for plan in tree.getiterator('subscription-plan'):
-            data = {
-                'name': plan.findtext('name'),
-                'description': plan.findtext('description'),
-                'terms': plan.findtext('terms'),
-                'plan_type': plan.findtext('plan-type'),
-                'price': Decimal(plan.findtext('price')),
-                'enabled': True if plan.findtext('enabled') == 'true' else False,
-                'force_recurring': \
-                    True if plan.findtext('force-recurring') == 'true' else False,
-                'force_renew': \
-                    True if plan.findtext('needs-to-be-renewed') == 'true' else False,
-                'duration': int(plan.findtext('duration-quantity')),
-                'duration_units': plan.findtext('duration-units'),
-                'feature_level': plan.findtext('feature-level'),
-                'return_url': plan.findtext('return-url'),
-                'version': int(plan.findtext('version')) \
-                    if plan.findtext('version') else 0,
-                'speedly_id': int(plan.findtext('id')),
-                'speedly_site_id': int(plan.findtext('site-id')) \
-                    if plan.findtext('site-id') else 0,
-                'created_at': str_to_datetime(plan.findtext('created-at')),
-                'date_changed': str_to_datetime(plan.findtext('updated-at')),
-            }
-            result.append(data)
+        result = objectify_spreedly(response.text)
         return result
 
     ## Subscriber manipulation
@@ -165,6 +107,7 @@ class Client(object):
         :param customer_id: Customer ID
         :param screen_name: Customer's screen name
         :returns: Data for created customer
+        :raises: HTTPError if response code isn't 201
         '''
         data = '''
         <subscriber>
@@ -176,15 +119,11 @@ class Client(object):
         response = self.query(url='subscribers.xml',data=data, action='post')
 
         # Parse
-        result = []
-        tree = fromstring(response.text)
-        for plan in tree.getiterator('subscriber'):
-            data = self._get_parsed_subscriber(plan)
-            result.append(data)
-        # Why are we parsing the entire dataset just to return the first?
-        return result[0]
+        if not response.status_code == 201:
+            raise requests.HTTPError("status code: {0}, text: {1}".format(response.status_code, response.text))
+        return objectify_spreedly(response.text)
 
-    def get_signup_url(self, subscriber_id, plan_id, screen_name):
+    def get_signup_url(self, subscriber_id, plan_id, screen_name, token=None):
         ''' .. py:method:: get_signup_url(subscriber_id, plan_id, screen_name)
         Subscribe a user to the site plan on a free trial
 
@@ -192,19 +131,30 @@ class Client(object):
         :param subscriber_id: ID of the subscriber
         :param plan_id: subscription plan ID
         :param screen_name: user screen name
+        :param token: customer token or None - if passed use the token version
+            of the url
         :returns: url for subscription
         '''
-        return 'subscribers/{id}/subscribe/{plan_id}/{screen_name}'.format(
-                id=subscriber_id, plan_id=plan_id,
-                screen_name=screen_name)
+        subscriber_id = str(subscriber_id)
+        plan_id = str(plan_id)
+        if token:
+            url = '/'.join(('subscribers',subscriber_id,token,
+                'subscribe', plan_id))
+        else:
+            url = '/'.join(('subscribers',subscriber_id,'subscribe',
+                plan_id,screen_name))
+        url = urljoin(self.base_url, url)
+        return url
 
     def subscribe(self, subscriber_id, plan_id=None):
         ''' .. py:method:: subscribe(subscriber_id, plan_id)
         Subscribe a user to the site plan on a free trial
 
-        subscribe a user to a plan, either trial or not
+        subscribe a user to a free trial plan.
         :param subscriber_id: ID of the subscriber
         :parma plan_id: subscription plan ID
+        :returns: dictionary with xml data if all is good
+        :raises: HTTPError if response status not 200
         '''
         #TODO - This lacks subscription for a site to a plan_id.
         data = '''
@@ -215,13 +165,11 @@ class Client(object):
         url = 'subscribers/{id}/subscribe_to_free_trial.xml'.format(id=subscriber_id)
         response = self.query(url, data, action='post')
 
+        if response.status_code != 200:
+            raise requests.HTTPError("status code: {0}, text: {1}".format(response.status_code, response.text))
+
         # Parse
-        result = []
-        tree = fromstring(response.text)
-        for plan in tree.getiterator('subscriber'):
-            data = self._get_parsed_subscriber(plan)
-            result.append(data)
-        return result[0]
+        return objectify_spreedly(response.text)
 
     def get_info(self, subscriber_id):
         """ .. py:method:: get_info(subscriber_id)
@@ -238,12 +186,46 @@ class Client(object):
             raise e
 
         # Parse
-        result = []
-        tree = fromstring(response.text)
-        for plan in tree.getiterator('subscriber'):
-            data = self._get_parsed_subscriber(plan)
-            result.append(data)
-        return result[0]
+        return objectify_spreedly(response.text)
+
+    def allow_free_trial(self, subscriber_id):
+        """ .. py:method:: allow_free_trial(subscriber_id)
+
+        programatically allow for a new free trial
+        :param subscriber_id: the id of the subscriber
+        :returns: subscriber data as dictionary if all good,
+        :raises: HTTPError if not so good (non-200)
+        """
+        url = 'subscribers/{id}/allow_free_trial.xml'.format(id=subscriber_id)
+        response = self.query(url,'', action='post')
+        if response.status_code is not 200:
+            raise requests.HTTPError('status; {0}, text {1}'.format(
+                response.status_code, response.text))
+        else:
+            return objectify_spreedly(response.text)
+
+
+    def add_fee(self, subscriber_id, name, description, group, amount):
+        """ .. py:method:: add_fee(subscriber_id, name, description, group, amount)
+        Add a fee to a user with subscriber_id
+        :param subscriber_id: the id of the subscriber
+        :param name: the name of the fee (eg - Excess Bandwidth Charge)
+        :param description: a description of the charge
+        :param group: a group to add this charge too
+        :param amount: the amount the charge is for
+        :returns: the response object
+        """
+        data = """
+        <fee>
+          <name>{name}</name>
+          <description>{description}</description>
+          <group>{group}</group>
+          <amount>{amount}</amount>
+        </fee>
+        """.format(name=name, description=description, group=group, amount=amount)
+        url = 'subscribers/{id}/fees.xml'.format(id=subscriber_id)
+        response = self.query(url,data, action='post')
+        return response
 
     def set_info(self, subscriber_id, **kw):
         """ .. py:method: set_info(subscriber_id[, **kw])
@@ -344,7 +326,7 @@ class Client(object):
         :returns: status code
         """
         if 'test' in self.base_path:
-            url = "{id}.xml".format(id=id)
+            url = "subscribers/{id}.xml".format(id=id)
             response = self.query(url,action='delete')
             return response.status_code
         return
