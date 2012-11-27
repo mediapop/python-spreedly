@@ -1,19 +1,19 @@
 #!/usr/bin/env python
 """
 =============================================================================
-python-spreedly
+pyspreedly
 =============================================================================
 
-python-spreedly is an python api wrapper to the spreedly web api.
+pyspreedly is an python api wrapper to the spreedly web api.
 """
 
 from setuptools import setup, find_packages
 
 setup(
-    name='python-spreedly',
+    name='pyspreedly',
     version='2.0',
     author='MediaPop',
-    author_email='',
+    author_email='dev@mediapop.co',
     url='http://github.org/mediapop/python-spreedly',
     description='API for spreedly',
     long_description=__doc__,
