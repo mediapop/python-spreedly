@@ -1,0 +1,365 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>API &mdash; pyspreedly 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pyspreedly 2.0 documentation" href="index.html" />
+    <link rel="prev" title="Welcome to pyspreedly’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to pyspreedly’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pyspreedly 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="api">
+<h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-pyspreedly.api">
+<span id="api-api"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">api</span></tt> API<a class="headerlink" href="#module-pyspreedly.api" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pyspreedly.api.Client">
+<em class="property">class </em><tt class="descclassname">pyspreedly.api.</tt><tt class="descname">Client</tt><big>(</big><em>token</em>, <em>site_name</em><big>)</big><a class="reference internal" href="_modules/pyspreedly/api.html#Client"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyspreedly.api.Client" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="class">
+<dt id="pyspreedly.api.Client.Client">
+<em class="property">class </em><tt class="descname">Client</tt><big>(</big><em>token</em>, <em>site_name</em><big>)</big><a class="headerlink" href="#pyspreedly.api.Client.Client" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Create an object to manage queries for a Client on a given site.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>token</strong> &#8211; API access token for authorization.</li>
+<li><strong>site_name</strong> &#8211; the site_name registered with spreedly.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="pyspreedly.api.Client.add_fee">
+<tt class="descclassname">Client.</tt><tt class="descname">add_fee</tt><big>(</big><em>subscriber_id</em>, <em>name</em>, <em>description</em>, <em>group</em>, <em>amount</em><big>)</big><a class="reference internal" href="_modules/pyspreedly/api.html#Client.add_fee"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyspreedly.api.Client.add_fee" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt>
+<tt class="descname">add_fee</tt><big>(</big><em>subscriber_id</em>, <em>name</em>, <em>description</em>, <em>group</em>, <em>amount</em><big>)</big><a class="reference internal" href="_modules/pyspreedly/api.html#Client.add_fee"><span class="viewcode-link">[source]</span></a></dt>
+<dd></dd></dl>
+
+<p>Add a fee to a user with subscriber_id
+:param subscriber_id: the id of the subscriber
+:param name: the name of the fee (eg - Excess Bandwidth Charge)
+:param description: a description of the charge
+:param group: a group to add this charge too
+:param amount: the amount the charge is for
+:returns: the response object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyspreedly.api.Client.allow_free_trial">
+<tt class="descclassname">Client.</tt><tt class="descname">allow_free_trial</tt><big>(</big><em>subscriber_id</em><big>)</big><a class="reference internal" href="_modules/pyspreedly/api.html#Client.allow_free_trial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyspreedly.api.Client.allow_free_trial" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt>
+<tt class="descname">allow_free_trial</tt><big>(</big><em>subscriber_id</em><big>)</big><a class="reference internal" href="_modules/pyspreedly/api.html#Client.allow_free_trial"><span class="viewcode-link">[source]</span></a></dt>
+<dd></dd></dl>
+
+<p>programatically allow for a new free trial
+:param subscriber_id: the id of the subscriber
+:returns: subscriber data as dictionary if all good,
+:raises: HTTPError if not so good (non-200)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyspreedly.api.Client.cleanup">
+<tt class="descclassname">Client.</tt><tt class="descname">cleanup</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyspreedly/api.html#Client.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyspreedly.api.Client.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt>
+<tt class="descname">cleanup</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyspreedly/api.html#Client.cleanup"><span class="viewcode-link">[source]</span></a></dt>
+<dd></dd></dl>
+
+<p>Removes ALL subscribers. NEVER USE IN PRODUCTION! (should only Remove
+test users...)
+:returns: status code</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyspreedly.api.Client.complimentary_time_extensions">
+<tt class="descclassname">Client.</tt><tt class="descname">complimentary_time_extensions</tt><big>(</big><em>subscriber_id</em>, <em>duration</em>, <em>duration_units</em><big>)</big><a class="reference internal" href="_modules/pyspreedly/api.html#Client.complimentary_time_extensions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyspreedly.api.Client.complimentary_time_extensions" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="pyspreedly.api.Client.complimentary_time_extension">
+<tt class="descname">complimentary_time_extension</tt><big>(</big><em>subscriber_id</em>, <em>duration</em>, <em>duration_units</em><big>)</big><a class="headerlink" href="#pyspreedly.api.Client.complimentary_time_extension" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>corrisponds to adding complimentary time extension to a subscriber</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyspreedly.api.Client.create_complimentary_subscription">
+<tt class="descclassname">Client.</tt><tt class="descname">create_complimentary_subscription</tt><big>(</big><em>subscriber_id</em>, <em>duration</em>, <em>duration_units</em>, <em>feature_level</em>, <em>start_time=None</em>, <em>amount=None</em><big>)</big><a class="reference internal" href="_modules/pyspreedly/api.html#Client.create_complimentary_subscription"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyspreedly.api.Client.create_complimentary_subscription" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt>
+<tt class="descname">create_complimentary_subscription</tt><big>(</big><em>subscriber_id</em>, <em>duration</em>, <em>duration_units</em>, <em>feature_level</em><span class="optional">[</span>, <em>start_time=None</em>, <em>amount=None</em><span class="optional">]</span><big>)</big><a class="reference internal" href="_modules/pyspreedly/api.html#Client.create_complimentary_subscription"><span class="viewcode-link">[source]</span></a></dt>
+<dd></dd></dl>
+
+<p>corrisponds to adding corrisponding subscription to a subscriber
+:param subscriber_id: Subscriber ID
+:param duration: Duration (unitless)
+:param duration_units: Unit for above (days, weeks, months i think)
+:param feature_level string: what feature level this is at
+:param start_time: If assgining a value for pro-rating purpose, you need this start datetime
+:type start_time: datetime.datetime or None
+:param amount: How much this comp is worth
+:type amount: float or None</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyspreedly.api.Client.create_subscriber">
+<tt class="descclassname">Client.</tt><tt class="descname">create_subscriber</tt><big>(</big><em>customer_id</em>, <em>screen_name</em><big>)</big><a class="reference internal" href="_modules/pyspreedly/api.html#Client.create_subscriber"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyspreedly.api.Client.create_subscriber" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a subscription
+:param customer_id: Customer ID
+:param screen_name: Customer&#8217;s screen name
+:returns: Data for created customer
+:raises: HTTPError if response code isn&#8217;t 201</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyspreedly.api.Client.delete_subscriber">
+<tt class="descclassname">Client.</tt><tt class="descname">delete_subscriber</tt><big>(</big><em>id</em><big>)</big><a class="reference internal" href="_modules/pyspreedly/api.html#Client.delete_subscriber"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyspreedly.api.Client.delete_subscriber" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt>
+<tt class="descname">delete_subscriber</tt><big>(</big><em>id</em><big>)</big><a class="reference internal" href="_modules/pyspreedly/api.html#Client.delete_subscriber"><span class="viewcode-link">[source]</span></a></dt>
+<dd></dd></dl>
+
+<p>delete a test subscriber
+:param id: user id
+:returns: status code</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyspreedly.api.Client.get_info">
+<tt class="descclassname">Client.</tt><tt class="descname">get_info</tt><big>(</big><em>subscriber_id</em><big>)</big><a class="reference internal" href="_modules/pyspreedly/api.html#Client.get_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyspreedly.api.Client.get_info" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt>
+<tt class="descname">get_info</tt><big>(</big><em>subscriber_id</em><big>)</big><a class="reference internal" href="_modules/pyspreedly/api.html#Client.get_info"><span class="viewcode-link">[source]</span></a></dt>
+<dd></dd></dl>
+
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>subscriber_id</strong> &#8211; Id of subscriber to fetch</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Data as dictionary</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body">HTTPError if not 200</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyspreedly.api.Client.get_or_create_subscriber">
+<tt class="descclassname">Client.</tt><tt class="descname">get_or_create_subscriber</tt><big>(</big><em>subscriber_id</em>, <em>screen_name</em><big>)</big><a class="reference internal" href="_modules/pyspreedly/api.html#Client.get_or_create_subscriber"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyspreedly.api.Client.get_or_create_subscriber" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt>
+<tt class="descname">get_or_create_subscriber</tt><big>(</big><em>subscriber_id</em>, <em>screen_name</em><big>)</big><a class="reference internal" href="_modules/pyspreedly/api.html#Client.get_or_create_subscriber"><span class="viewcode-link">[source]</span></a></dt>
+<dd></dd></dl>
+
+<p>Tries to get info for a subscriber, else creates a new subscriber</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyspreedly.api.Client.get_plans">
+<tt class="descclassname">Client.</tt><tt class="descname">get_plans</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyspreedly/api.html#Client.get_plans"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyspreedly.api.Client.get_plans" title="Permalink to this definition">¶</a></dt>
+<dd><p>get subscription plans for the configured site
+:returns: data as dict
+:raises: <tt class="xref py py-exc docutils literal"><span class="pre">HTTPError</span></tt> if response is not 200</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyspreedly.api.Client.get_signup_url">
+<tt class="descclassname">Client.</tt><tt class="descname">get_signup_url</tt><big>(</big><em>subscriber_id</em>, <em>plan_id</em>, <em>screen_name</em>, <em>token=None</em><big>)</big><a class="reference internal" href="_modules/pyspreedly/api.html#Client.get_signup_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyspreedly.api.Client.get_signup_url" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt>
+<tt class="descname">get_signup_url</tt><big>(</big><em>subscriber_id</em>, <em>plan_id</em>, <em>screen_name</em><big>)</big><a class="reference internal" href="_modules/pyspreedly/api.html#Client.get_signup_url"><span class="viewcode-link">[source]</span></a></dt>
+<dd></dd></dl>
+
+<p>Subscribe a user to the site plan on a free trial</p>
+<p>subscribe a user to a plan, either trial or not
+:param subscriber_id: ID of the subscriber
+:param plan_id: subscription plan ID
+:param screen_name: user screen name
+:param token: customer token or None - if passed use the token version</p>
+<blockquote>
+<div>of the url</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">url for subscription</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyspreedly.api.Client.query">
+<tt class="descclassname">Client.</tt><tt class="descname">query</tt><big>(</big><em>url</em>, <em>data=None</em>, <em>action='get'</em><big>)</big><a class="reference internal" href="_modules/pyspreedly/api.html#Client.query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyspreedly.api.Client.query" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt>
+<tt class="descname">query</tt><big>(</big><em>url</em><span class="optional">[</span>, <em>data=None</em>, <em>put='get'</em><span class="optional">]</span><big>)</big><a class="reference internal" href="_modules/pyspreedly/api.html#Client.query"><span class="viewcode-link">[source]</span></a></dt>
+<dd></dd></dl>
+
+<p>which has the problem that it doesn&#8217;t check if there is data for
+PUT, and is hard to read.</p>
+<p>status_codes are not checked here, and should be handled by the
+caller.</p>
+<p>Delete is only supported on test users</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>url</strong> &#8211; the api url you wish to reach (not incuding site/version)</li>
+<li><strong>data</strong> (<em>UTF-8 encoded XML or None</em>) &#8211; the data to send in the request. Default to <cite>None</cite></li>
+<li><strong>action</strong> &#8211; one of &#8216;get&#8217;, &#8216;post&#8217;, &#8216;put&#8217; and &#8216;delete&#8217;.  Case insensitive, Default &#8216;get&#8217;</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">response object</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><tt class="xref py py-mod docutils literal"><span class="pre">requests</span></tt> response object</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyspreedly.api.Client.set_info">
+<tt class="descclassname">Client.</tt><tt class="descname">set_info</tt><big>(</big><em>subscriber_id</em>, <em>**kw</em><big>)</big><a class="reference internal" href="_modules/pyspreedly/api.html#Client.set_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyspreedly.api.Client.set_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>this corrisponds to the update-subscriber action. passed kw args are
+placed into the xml data (not sure how the -/_ are dealt with though)</p>
+<p>There is a design flaw atm where sclient.set_info(sclient.get_info(123))
+will not work at all as the keys are all different</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyspreedly.api.Client.subscribe">
+<tt class="descclassname">Client.</tt><tt class="descname">subscribe</tt><big>(</big><em>subscriber_id</em>, <em>plan_id=None</em><big>)</big><a class="reference internal" href="_modules/pyspreedly/api.html#Client.subscribe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyspreedly.api.Client.subscribe" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt>
+<tt class="descname">subscribe</tt><big>(</big><em>subscriber_id</em>, <em>plan_id</em><big>)</big><a class="reference internal" href="_modules/pyspreedly/api.html#Client.subscribe"><span class="viewcode-link">[source]</span></a></dt>
+<dd></dd></dl>
+
+<p>Subscribe a user to the site plan on a free trial</p>
+<p>subscribe a user to a free trial plan.
+:param subscriber_id: ID of the subscriber
+:parma plan_id: subscription plan ID
+:returns: dictionary with xml data if all is good
+:raises: HTTPError if response status not 200</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">API</a><ul>
+<li><a class="reference internal" href="#module-pyspreedly.api"><tt class="docutils literal"><span class="pre">api</span></tt> API</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to pyspreedly&#8217;s documentation!</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/api.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to pyspreedly’s documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">pyspreedly 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, James Rivett-Carnac.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
