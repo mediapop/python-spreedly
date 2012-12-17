@@ -11,7 +11,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='pyspreedly',
-    version='2.0-alpha',
+    version='2.0',
     author='MediaPop',
     author_email='dev@mediapop.co',
     url='http://github.org/mediapop/python-spreedly',
