@@ -21,6 +21,7 @@ setup(
     zip_safe=False,
     install_requires=[
         'requests>=0.14.0',
+        'pytz>=2012f',
     ],
     test_requires=[
         'nose>=1.2.1',
