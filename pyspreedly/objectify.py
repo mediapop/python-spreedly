@@ -11,7 +11,7 @@ _sub_dash = re.compile('-')
 _types = {
     'string'   :  lambda x: x,
     'integer'  :  int,
-    'datetime' :  lambda s: pytz.datetime.datetime.strptime(s, '%Y-%m-%dT%H:%M:%SZ') if s else None,
+    'datetime' :  lambda s: pytz.datetime.datetime.strptime(s, '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=pytz.utc) if s else None,
     'decimal'  :  Decimal,
     'boolean'  :  lambda x: x == 'true',
     'array'    :  lambda x: [],  ## Return an empty array
