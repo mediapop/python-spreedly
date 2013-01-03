@@ -1,7 +1,7 @@
 import xml.etree.ElementTree
 from xml.etree import ElementTree as ET
 from cStringIO import StringIO
-from datetime import datetime
+import pytz
 from decimal import Decimal
 import re
 
@@ -11,7 +11,7 @@ _sub_dash = re.compile('-')
 _types = {
     'string'   :  lambda x: x,
     'integer'  :  int,
-    'datetime' :  lambda s: datetime.strptime(s, '%Y-%m-%dT%H:%M:%SZ') if s else None,
+    'datetime' :  lambda s: pytz.datetime.datetime.strptime(s, '%Y-%m-%dT%H:%M:%SZ') if s else None,
     'decimal'  :  Decimal,
     'boolean'  :  lambda x: x == 'true',
     'array'    :  lambda x: [],  ## Return an empty array
