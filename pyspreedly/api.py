@@ -4,11 +4,15 @@ import requests
 from datetime import datetime
 from xml.etree import ElementTree as ET
 from objectify import objectify_spreedly
+import re
+
 
 __all__ = [
         'API_VERSION', 'Client', ]
 
 API_VERSION = 'v4'
+
+_user_exists_re = re.compile(ur"A subscriber with a customer-id of \d+ already exists.", re.UNICODE)
 
 
 def utc_to_local(dt):
@@ -120,6 +124,8 @@ class Client(object):
 
         # Parse
         if not response.status_code == 201:
+            if response.status_code == 403 and _user_exists_re.search(response.text):
+                return self.get_info(customer_id)
             e = requests.HTTPError(
                     "status code: {0}, text: {1}".format(
                         response.status_code, response.text))
