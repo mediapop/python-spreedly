@@ -335,11 +335,9 @@ class Client(object):
         :param id: user id
         :returns: status code
         """
-        if 'test' in self.base_path:
-            url = "subscribers/{id}.xml".format(id=id)
-            response = self.query(url,action='delete')
-            return response.status_code
-        return
+        url = "subscribers/{id}.xml".format(id=id)
+        response = self.query(url,action='delete')
+        return response.status_code
 
     def cleanup(self):
         """ .. py:method:: cleanup()
@@ -347,8 +345,5 @@ class Client(object):
         test users...)
         :returns: status code
         """
-        if 'test' in self.base_path:
-            response = self.query('subscribers.xml', action='delete')
-            return response.status_code
-        return
-
+        response = self.query('subscribers.xml', action='delete')
+        return response.status_code
