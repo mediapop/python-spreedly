@@ -120,10 +120,11 @@ class Client(object):
 
         # Parse
         if not response.status_code == 201:
-            raise requests.HTTPError(
-                    message="status code: {0}, text: {1}".format(
-                        response.status_code, response.text),
-                    response=response)
+            e = requests.HTTPError(
+                    "status code: {0}, text: {1}".format(
+                        response.status_code, response.text))
+            e.response = response
+            raise e
         return objectify_spreedly(response.text)
 
     def get_signup_url(self, subscriber_id, plan_id, screen_name, token=None):
