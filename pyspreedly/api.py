@@ -181,14 +181,14 @@ class Client(object):
         # Parse
         return objectify_spreedly(response.text)
 
-    def change_plan(self, subscriber_id, plan_id=None):
-        ''' .. py:method:: subscribe(subscriber_id, plan_id)
-        Subscribe a user to the site plan on a free trial
+    def change_plan(self, subscriber_id, plan_id):
+        ''' .. py:method:: change_plan(subscriber_id, plan_id)
+        Change a subscription to a new plan, needs the user to be activated
 
         subscribe a user to a free trial plan.
         :param subscriber_id: ID of the subscriber
-        :parma plan_id: subscription plan ID
-        :returns: dictionary with xml data if all is good
+        :parma plan_id: subscription plan ID to change to
+        :returns: status code
         :raises: HTTPError if response status not 200
         '''
         #TODO - This lacks subscription for a site to a plan_id.
@@ -198,13 +198,13 @@ class Client(object):
         </subscription_plan>'''.format(plan_id=plan_id)
 
         url = 'subscribers/{id}/change_subscription_plan.xml'.format(id=subscriber_id)
-        response = self.query(url, data, action='post')
+        response = self.query(url, data, action='put')
 
         if response.status_code != 200:
             raise requests.HTTPError("status code: {0}, text: {1}".format(response.status_code, response.text))
 
         # Parse
-        return objectify_spreedly(response.text)
+        return response.status_code
 
     def get_info(self, subscriber_id):
         """ .. py:method:: get_info(subscriber_id)
