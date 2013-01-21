@@ -64,8 +64,8 @@ def objectify_spreedly(xml):
     :param xml: xml string or file object.  If it is a string, it is turned into :py:class:`StringIO`.
     """
     if not hasattr(xml, 'read'):
-        xml_io = StringIO(xml)
-    tree = ET.parse(xml_io)
+        xml = StringIO(xml)
+    tree = ET.parse(xml)
     data = parse_element(tree.getroot())[_sub_dash.sub('_',tree.getroot().tag)]
     for key in ['customer_id', 'pagination_id',]:
         try:
