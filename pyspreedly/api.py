@@ -41,6 +41,7 @@ class Client(object):
 
     def __init__(self, token, site_name):
         self.auth = token
+        self.site_name = site_name
         self.base_host = 'https://spreedly.com'
         self.base_path = '/api/{api_version}/{site_name}/'.format(
                 api_version=API_VERSION, site_name=site_name)
@@ -134,7 +135,7 @@ class Client(object):
         return objectify_spreedly(response.text)
 
     def get_signup_url(self, subscriber_id, plan_id, screen_name, token=None):
-        ''' .. py:method:: get_signup_url(subscriber_id, plan_id, screen_name)
+        ''' .. py:method:: get_signup_url(subscriber_id, plan_id, screen_name, token=None)
         Subscribe a user to the site plan on a free trial
 
         subscribe a user to a plan, either trial or not
@@ -148,12 +149,12 @@ class Client(object):
         subscriber_id = str(subscriber_id)
         plan_id = str(plan_id)
         if token:
-            url = '/'.join(('subscribers',subscriber_id,token,
+            url = '/'.join((self.site_name, 'subscribers',subscriber_id,token,
                 'subscribe', plan_id))
         else:
-            url = '/'.join(('subscribers',subscriber_id,'subscribe',
+            url = '/'.join((self.site_name, 'subscribers',subscriber_id,'subscribe',
                 plan_id,screen_name))
-        url = urljoin(self.base_url, url)
+        url = urljoin(self.base_host, url)
         return url
 
     def subscribe(self, subscriber_id, plan_id=None):
