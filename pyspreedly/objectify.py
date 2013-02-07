@@ -4,6 +4,12 @@ from cStringIO import StringIO
 import pytz
 from decimal import Decimal
 import re
+import logging
+
+
+logger = logging.getLogger(__name__)
+
+
 
 _sub_dash = re.compile('-')
 
@@ -65,7 +71,11 @@ def objectify_spreedly(xml):
     """
     if not hasattr(xml, 'read'):
         xml = StringIO(xml)
-    tree = ET.parse(xml)
+    try:
+        tree = ET.parse(xml)
+    except ET.ParseError:
+        xml.seek(0)
+        logger.error("XML parsing failed.  XML: \n" + xml.read())
     data = parse_element(tree.getroot())[_sub_dash.sub('_',tree.getroot().tag)]
     for key in ['customer_id', 'pagination_id',]:
         try:
