@@ -73,9 +73,12 @@ def objectify_spreedly(xml):
         xml = StringIO(xml)
     try:
         tree = ET.parse(xml)
-    except ET.ParseError:
+    except ET.ParseError as e:
         xml.seek(0)
+        xml = xml.read()
         logger.error("XML parsing failed.  XML: \n" + xml.read())
+        e.msg = e.msg + xml 
+        raise e
     data = parse_element(tree.getroot())[_sub_dash.sub('_',tree.getroot().tag)]
     for key in ['customer_id', 'pagination_id',]:
         try:
