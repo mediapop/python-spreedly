@@ -1,6 +1,7 @@
 import xml.etree.ElementTree
 from xml.etree import ElementTree as ET
-from cStringIO import StringIO
+from StringIO import StringIO
+import codecs
 import pytz
 from decimal import Decimal
 import re
@@ -70,14 +71,17 @@ def objectify_spreedly(xml):
     :param xml: xml string or file object.  If it is a string, it is turned into :py:class:`StringIO`.
     """
     if not hasattr(xml, 'read'):
-        xml = StringIO(xml)
+        _xml = xml
+        buffer = StringIO()
+        utf8_codec = codecs.lookup("utf8")
+        xml = codecs.StreamReaderWriter(buffer,
+                                        utf8_codec.streamreader,
+                                        utf8_codec.streamwriter)
+        xml.write(_xml)
+        xml.seek(0)
     try:
         tree = ET.parse(xml)
     except ET.ParseError as e:
-        xml.seek(0)
-        xml = xml.read()
-        logger.error("XML parsing failed.  XML: \n" + xml.read())
-        e.msg = e.msg + xml 
         raise e
     data = parse_element(tree.getroot())[_sub_dash.sub('_',tree.getroot().tag)]
     for key in ['customer_id', 'pagination_id',]:
